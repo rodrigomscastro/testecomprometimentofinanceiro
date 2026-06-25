@@ -45,7 +45,7 @@ function LoginForm() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6">
-      <h1 className="mb-6 max-w-sm text-center text-2xl font-extrabold uppercase tracking-wide text-brand-dark">
+      <h1 className="mb-6 max-w-sm text-center text-2xl font-black uppercase tracking-wide text-brand-dark subpixel-antialiased">
         Teste de Status e Comprometimento Financeiro
       </h1>
       <form
