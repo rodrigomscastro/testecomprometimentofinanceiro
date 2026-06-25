@@ -9,6 +9,7 @@ import ShareLink from "@/components/ShareLink";
 import EventActions from "@/components/EventActions";
 import QrCodePanel from "@/components/QrCodePanel";
 import LiveRefresh from "@/components/LiveRefresh";
+import EditableEventName from "@/components/EditableEventName";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +49,7 @@ export default async function EventDetailPage({
 
       <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-brand-dark">{event.name}</h1>
+          <EditableEventName eventId={event.id} name={event.name} />
           <p className="text-sm text-slate-500">
             Criado em {new Date(event.createdAt).toLocaleString("pt-BR")}
           </p>

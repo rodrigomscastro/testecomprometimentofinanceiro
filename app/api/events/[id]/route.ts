@@ -13,13 +13,27 @@ export async function PATCH(
   }
 
   const body = await req.json().catch(() => null);
-  if (typeof body?.active !== "boolean") {
+
+  const data: { active?: boolean; name?: string } = {};
+  if (typeof body?.active === "boolean") data.active = body.active;
+  if (body?.name !== undefined) {
+    const name = body.name.toString().trim();
+    if (!name) {
+      return NextResponse.json(
+        { error: "Informe o nome do evento." },
+        { status: 400 }
+      );
+    }
+    data.name = name;
+  }
+
+  if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
   }
 
   const event = await prisma.event.update({
     where: { id: params.id },
-    data: { active: body.active },
+    data,
   });
 
   return NextResponse.json(event);
