@@ -1,0 +1,112 @@
+import type { Submission } from "@prisma/client";
+import { RESULT_BANDS, type Category } from "./quiz";
+
+export interface CountItem {
+  label: string;
+  value: number;
+  color?: string;
+}
+
+export interface EventStats {
+  total: number;
+  averageScore: number;
+  categories: CountItem[]; // Verde / Amarelo / Vermelho
+  scoreHistogram: CountItem[]; // faixas de 0-10, 11-20, ...
+  estadoCivil: CountItem[];
+  filhos: CountItem[];
+  faixaRenda: CountItem[];
+  adventista: CountItem[];
+  casaPropria: CountItem[];
+  veiculo: CountItem[];
+  investimentos: CountItem[];
+}
+
+function tally(values: string[]): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const v of values) m.set(v, (m.get(v) ?? 0) + 1);
+  return m;
+}
+
+function simYesNo(items: Submission[], pick: (s: Submission) => boolean): CountItem[] {
+  let sim = 0;
+  let nao = 0;
+  for (const s of items) (pick(s) ? sim++ : nao++);
+  return [
+    { label: "Sim", value: sim, color: "#1d4ed8" },
+    { label: "Não", value: nao, color: "#94a3b8" },
+  ];
+}
+
+export function buildStats(submissions: Submission[]): EventStats {
+  const total = submissions.length;
+
+  const averageScore =
+    total === 0
+      ? 0
+      : Math.round(
+          (submissions.reduce((acc, s) => acc + s.score, 0) / total) * 10
+        ) / 10;
+
+  // Categorias na ordem Verde -> Amarelo -> Vermelho
+  const catOrder: Category[] = ["VERDE", "AMARELO", "VERMELHO"];
+  const catTally = tally(submissions.map((s) => s.category));
+  const categories: CountItem[] = catOrder.map((c) => ({
+    label: RESULT_BANDS[c].title,
+    value: catTally.get(c) ?? 0,
+    color: RESULT_BANDS[c].color,
+  }));
+
+  // Histograma de pontuação em faixas de 10 (0-10, 11-20, ..., 91-100)
+  const buckets = [
+    "0-10",
+    "11-20",
+    "21-30",
+    "31-40",
+    "41-50",
+    "51-60",
+    "61-70",
+    "71-80",
+    "81-90",
+    "91-100",
+  ];
+  const histo = new Array(buckets.length).fill(0);
+  for (const s of submissions) {
+    let idx = Math.ceil(s.score / 10) - 1;
+    if (s.score <= 10) idx = 0;
+    if (idx < 0) idx = 0;
+    if (idx > buckets.length - 1) idx = buckets.length - 1;
+    histo[idx]++;
+  }
+  const scoreHistogram: CountItem[] = buckets.map((label, i) => ({
+    label,
+    value: histo[i],
+    color: "#1d4ed8",
+  }));
+
+  const ecTally = tally(submissions.map((s) => s.estadoCivil));
+  const estadoCivil: CountItem[] = [
+    { label: "Casado", value: ecTally.get("CASADO") ?? 0, color: "#1d4ed8" },
+    { label: "Solteiro", value: ecTally.get("SOLTEIRO") ?? 0, color: "#0ea5e9" },
+  ];
+
+  const frTally = tally(
+    submissions.filter((s) => s.faixaRenda).map((s) => s.faixaRenda as string)
+  );
+  const faixaRenda: CountItem[] = Array.from(frTally.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([label, value]) => ({ label, value, color: "#1d4ed8" }));
+
+  return {
+    total,
+    averageScore,
+    categories,
+    scoreHistogram,
+    estadoCivil,
+    filhos: simYesNo(submissions, (s) => s.temFilhos),
+    faixaRenda,
+    adventista: simYesNo(submissions, (s) => s.ehAdventista),
+    casaPropria: simYesNo(submissions, (s) => s.casaPropria),
+    veiculo: simYesNo(submissions, (s) => s.veiculo),
+    investimentos: simYesNo(submissions, (s) => s.investimentos),
+  };
+}

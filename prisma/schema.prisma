@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Event {
+  id          String       @id @default(cuid())
+  name        String
+  publicId    String       @unique
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  submissions Submission[]
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   String
+  createdAt DateTime @default(now())
+
+  // Resultado do teste
+  score    Int
+  category String // "VERDE" | "AMARELO" | "VERMELHO"
+  answers  Json // [{ q: number, option: "A"|"B"|"C", points: number }]
+
+  // Perfil do participante (anônimo)
+  estadoCivil   String // "CASADO" | "SOLTEIRO"
+  temFilhos     Boolean
+  qtdFilhos     Int? // preenchido apenas quando temFilhos = true
+  idade         Int
+  ehAdventista  Boolean
+  possuiRenda   Boolean
+  faixaRenda    String? // preenchido apenas quando possuiRenda = true
+  casaPropria   Boolean
+  veiculo       Boolean
+  investimentos Boolean
+
+  @@index([eventId])
+}
