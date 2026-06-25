@@ -115,9 +115,15 @@ export function buildStats(submissions: Submission[]): EventStats {
   const frTally = tally(
     submissions.filter((s) => s.faixaRenda).map((s) => s.faixaRenda as string)
   );
+  // Paleta de cores distintas para faixas (categorias sem cor semântica própria).
+  const PALETTE = ["#1d4ed8", "#0ea5e9", "#6366f1", "#8b5cf6", "#14b8a6", "#f59e0b"];
   const faixaRenda: CountItem[] = Array.from(frTally.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([label, value]) => ({ label, value, color: "#1d4ed8" }));
+    .map(([label, value], i) => ({
+      label,
+      value,
+      color: PALETTE[i % PALETTE.length],
+    }));
 
   // Distribuição A/B/C por pergunta, lendo o campo answers de cada submissão.
   const optionKeys: OptionKey[] = ["A", "B", "C"];
