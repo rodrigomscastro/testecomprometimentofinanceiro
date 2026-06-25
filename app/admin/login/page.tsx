@@ -43,12 +43,15 @@ function LoginForm() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6">
+      <h1 className="mb-6 max-w-sm text-center text-2xl font-bold uppercase tracking-wide text-brand-dark">
+        Teste de Status e Comprometimento Financeiro
+      </h1>
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-sm rounded-xl bg-white p-8 shadow-md"
       >
-        <h1 className="text-2xl font-bold text-brand-dark">Painel</h1>
+        <h2 className="text-2xl font-bold text-brand-dark">Painel</h2>
         <p className="mt-1 text-sm text-slate-500">
           Acesse com suas credenciais de administrador.
         </p>
