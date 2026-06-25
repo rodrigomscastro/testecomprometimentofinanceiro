@@ -206,7 +206,7 @@ export default function EventCharts({
             <SimplePie data={stats.categories} />
           </ChartCard>
           <ChartCard title="Histograma de pontuações">
-            <SimplePie data={stats.scoreHistogram} />
+            <SimpleHBar data={stats.scoreHistogram} />
           </ChartCard>
           <ChartCard title="Estado civil">
             <SimplePie data={stats.estadoCivil} />
