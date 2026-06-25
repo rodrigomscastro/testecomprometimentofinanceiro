@@ -31,30 +31,41 @@ function ChartCard({
   return (
     <div className="rounded-xl bg-white p-5 shadow-sm">
       <h3 className="mb-4 font-semibold text-slate-700">{title}</h3>
-      <div className={`${tall ? "h-96" : "h-64"} w-full`}>{children}</div>
+      <div className={`${tall ? "h-96" : "h-72"} w-full`}>{children}</div>
     </div>
   );
 }
 
 function SimplePie({ data }: { data: CountItem[] }) {
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={data}
-          dataKey="value"
-          nameKey="label"
-          outerRadius={80}
-          label={(e) => `${e.label}: ${e.value}`}
-        >
-          {data.map((d, i) => (
-            <Cell key={i} fill={d.color ?? DEFAULT_BAR} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
+    <div className="flex h-full flex-col">
+      <div className="min-h-0 flex-1">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie data={data} dataKey="value" nameKey="label" outerRadius="80%">
+              {data.map((d, i) => (
+                <Cell key={i} fill={d.color ?? DEFAULT_BAR} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      {/* Legenda própria: quebra linha e mostra o valor, sem cortar/sobrepor */}
+      <ul className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-600">
+        {data.map((d, i) => (
+          <li key={i} className="flex items-center gap-1.5">
+            <span
+              className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-sm"
+              style={{ backgroundColor: d.color ?? DEFAULT_BAR }}
+            />
+            <span>
+              {d.label}: <strong className="font-semibold">{d.value}</strong>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
