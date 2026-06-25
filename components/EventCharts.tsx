@@ -128,12 +128,14 @@ function GroupedHBar({
 }
 
 // Monta os dados das perguntas no formato { name: "P1", A, B, C } para o GroupedHBar.
+// Usa a posição (A, B, C) — independe do rótulo, que agora traz o texto da resposta.
 function questionsToGrouped(questions: QuestionStat[]) {
-  return questions.map((q) => {
-    const row: Record<string, string | number> = { name: `P${q.q}` };
-    for (const c of q.counts) row[c.label] = c.value;
-    return row;
-  });
+  return questions.map((q) => ({
+    name: `P${q.q}`,
+    A: q.counts[0]?.value ?? 0,
+    B: q.counts[1]?.value ?? 0,
+    C: q.counts[2]?.value ?? 0,
+  }));
 }
 
 // Junta várias séries Sim/Não num só dataset { name, Sim, Não }.

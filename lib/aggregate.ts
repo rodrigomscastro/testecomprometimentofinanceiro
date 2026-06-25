@@ -134,11 +134,15 @@ export function buildStats(submissions: Submission[]): EventStats {
     return {
       q: question.q,
       text: question.text,
-      counts: optionKeys.map((key) => ({
-        label: key,
-        value: m?.get(key) ?? 0,
-        color: OPTION_COLORS[key],
-      })),
+      counts: optionKeys.map((key) => {
+        const optionLabel = question.options.find((o) => o.key === key)?.label;
+        return {
+          // Rótulo legível com a resposta (ex.: "A) Antes do fim do mês").
+          label: optionLabel ? `${key}) ${optionLabel}` : key,
+          value: m?.get(key) ?? 0,
+          color: OPTION_COLORS[key],
+        };
+      }),
     };
   });
 
