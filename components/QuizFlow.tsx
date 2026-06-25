@@ -287,13 +287,19 @@ export default function QuizFlow({
         <div className="mt-6 space-y-3">
           {question.options.map((opt) => (
             <button
-              key={opt.key}
-              onClick={() => answer(opt.key)}
+              // Inclui o número da pergunta para remontar os botões a cada
+              // pergunta — evita o "sticky hover" do toque carregar o destaque
+              // para a opção de mesma posição na pergunta seguinte (mobile).
+              key={`q${question.q}-${opt.key}`}
+              onClick={(e) => {
+                e.currentTarget.blur();
+                answer(opt.key);
+              }}
               disabled={submitting}
               className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors disabled:opacity-60 ${
                 selected === opt.key
                   ? "border-brand bg-brand/5"
-                  : "border-slate-200 hover:border-brand hover:bg-slate-50"
+                  : "border-slate-200 [@media(hover:hover)]:hover:border-brand [@media(hover:hover)]:hover:bg-slate-50"
               }`}
             >
               <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
