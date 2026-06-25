@@ -8,9 +8,11 @@ async function main() {
   const password = process.env.ADMIN_PASSWORD;
 
   if (!email || !password) {
-    throw new Error(
-      "Defina ADMIN_EMAIL e ADMIN_PASSWORD no .env antes de rodar o seed."
+    console.warn(
+      "[seed] ADMIN_EMAIL/ADMIN_PASSWORD não definidos — pulando criação do admin. " +
+        "Defina as variáveis de ambiente e faça um novo deploy para criar o login."
     );
+    return;
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
