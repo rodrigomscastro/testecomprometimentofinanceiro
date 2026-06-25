@@ -7,6 +7,8 @@ import { buildStats } from "@/lib/aggregate";
 import EventCharts from "@/components/EventCharts";
 import ShareLink from "@/components/ShareLink";
 import EventActions from "@/components/EventActions";
+import QrCodePanel from "@/components/QrCodePanel";
+import LiveRefresh from "@/components/LiveRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -70,17 +72,16 @@ export default async function EventDetailPage({
             </p>
           )}
         </div>
-        <div className="flex flex-col items-center justify-center rounded-xl bg-white p-6 shadow-sm">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={qrDataUrl} alt="QR Code do evento" className="w-56 h-56" />
-          <a
-            href={qrDataUrl}
-            download={`qrcode-${event.publicId}.png`}
-            className="mt-3 text-sm font-medium text-brand hover:underline"
-          >
-            Baixar QR Code
-          </a>
-        </div>
+        <QrCodePanel
+          qrDataUrl={qrDataUrl}
+          publicUrl={publicUrl}
+          publicId={event.publicId}
+        />
+      </section>
+
+      {/* Controle de atualização ao vivo */}
+      <section className="mt-6 flex justify-end">
+        <LiveRefresh />
       </section>
 
       {/* Métricas */}
