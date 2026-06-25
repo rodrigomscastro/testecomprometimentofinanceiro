@@ -19,6 +19,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -44,15 +45,17 @@ function LoginForm() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6">
-      <h1 className="mb-6 max-w-sm text-center text-2xl font-bold uppercase tracking-wide text-brand-dark">
+      <h1 className="mb-6 max-w-sm text-center text-2xl font-extrabold uppercase tracking-wide text-brand-dark">
         Teste de Status e Comprometimento Financeiro
       </h1>
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-sm rounded-xl bg-white p-8 shadow-md"
       >
-        <h2 className="text-2xl font-bold text-brand-dark">Painel</h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <h2 className="text-center text-2xl font-bold text-brand-dark">
+          Painel Administrativo
+        </h2>
+        <p className="mt-1 text-center text-sm text-slate-500">
           Acesse com suas credenciais de administrador.
         </p>
 
@@ -69,13 +72,22 @@ function LoginForm() {
 
         <label className="mt-4 block text-sm font-medium text-slate-700">
           Senha
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-brand focus:outline-none"
-          />
+          <div className="relative mt-1">
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 pr-16 focus:border-brand focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute inset-y-0 right-0 px-3 text-xs font-medium text-brand hover:underline"
+            >
+              {showPassword ? "Ocultar" : "Mostrar"}
+            </button>
+          </div>
         </label>
 
         {error && <p className="mt-4 text-sm text-result-red">{error}</p>}
