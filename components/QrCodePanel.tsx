@@ -30,6 +30,37 @@ export default function QrCodePanel({
     }
   }
 
+  function downloadFallback() {
+    const a = document.createElement("a");
+    a.href = qrDataUrl;
+    a.download = `qrcode-${publicId}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  async function share() {
+    try {
+      const blob = await (await fetch(qrDataUrl)).blob();
+      const file = new File([blob], `qrcode-${publicId}.png`, {
+        type: "image/png",
+      });
+      // Web Share API com arquivo (celular): abre WhatsApp e afins.
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Teste de Comprometimento Financeiro",
+          text: publicUrl,
+        });
+        return;
+      }
+    } catch {
+      // usuário cancelou ou navegador não suporta — cai no fallback
+    }
+    // Fallback (desktop): baixa o PNG.
+    downloadFallback();
+  }
+
   useEffect(() => {
     if (!fullscreen) return;
 
@@ -61,13 +92,12 @@ export default function QrCodePanel({
         >
           Ver em tela cheia
         </button>
-        <a
-          href={qrDataUrl}
-          download={`qrcode-${publicId}.png`}
+        <button
+          onClick={share}
           className="text-sm font-medium text-brand hover:underline"
         >
-          Baixar QR Code
-        </a>
+          Compartilhar
+        </button>
       </div>
 
       {fullscreen && (

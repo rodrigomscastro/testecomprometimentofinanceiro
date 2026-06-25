@@ -1,10 +1,22 @@
 import type { Submission } from "@prisma/client";
-import { RESULT_BANDS, type Category } from "./quiz";
+import {
+  QUIZ_QUESTIONS,
+  RESULT_BANDS,
+  type AnswerRecord,
+  type Category,
+  type OptionKey,
+} from "./quiz";
 
 export interface CountItem {
   label: string;
   value: number;
   color?: string;
+}
+
+export interface QuestionStat {
+  q: number;
+  text: string;
+  counts: CountItem[]; // contagem de A / B / C
 }
 
 export interface EventStats {
@@ -19,7 +31,15 @@ export interface EventStats {
   casaPropria: CountItem[];
   veiculo: CountItem[];
   investimentos: CountItem[];
+  questions: QuestionStat[]; // distribuição A/B/C por pergunta do teste
 }
+
+// Cores das alternativas: A=pior, C=melhor (coerente com a pontuação 10/5/0).
+const OPTION_COLORS: Record<OptionKey, string> = {
+  A: "#dc2626",
+  B: "#eab308",
+  C: "#16a34a",
+};
 
 function tally(values: string[]): Map<string, number> {
   const m = new Map<string, number>();
@@ -96,6 +116,32 @@ export function buildStats(submissions: Submission[]): EventStats {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([label, value]) => ({ label, value, color: "#1d4ed8" }));
 
+  // Distribuição A/B/C por pergunta, lendo o campo answers de cada submissão.
+  const optionKeys: OptionKey[] = ["A", "B", "C"];
+  const perQuestion = new Map<number, Map<OptionKey, number>>();
+  for (const s of submissions) {
+    const records = (s.answers as unknown as AnswerRecord[]) ?? [];
+    if (!Array.isArray(records)) continue;
+    for (const r of records) {
+      if (!optionKeys.includes(r.option)) continue;
+      const m = perQuestion.get(r.q) ?? new Map<OptionKey, number>();
+      m.set(r.option, (m.get(r.option) ?? 0) + 1);
+      perQuestion.set(r.q, m);
+    }
+  }
+  const questions: QuestionStat[] = QUIZ_QUESTIONS.map((question) => {
+    const m = perQuestion.get(question.q);
+    return {
+      q: question.q,
+      text: question.text,
+      counts: optionKeys.map((key) => ({
+        label: key,
+        value: m?.get(key) ?? 0,
+        color: OPTION_COLORS[key],
+      })),
+    };
+  });
+
   return {
     total,
     averageScore,
@@ -108,5 +154,6 @@ export function buildStats(submissions: Submission[]): EventStats {
     casaPropria: simYesNo(submissions, (s) => s.casaPropria),
     veiculo: simYesNo(submissions, (s) => s.veiculo),
     investimentos: simYesNo(submissions, (s) => s.investimentos),
+    questions,
   };
 }
