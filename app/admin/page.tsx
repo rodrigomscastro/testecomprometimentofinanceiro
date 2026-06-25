@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import CreateEventForm from "@/components/CreateEventForm";
 import SignOutButton from "@/components/SignOutButton";
+import DeleteEventButton from "@/components/DeleteEventButton";
 
 export const dynamic = "force-dynamic";
 
@@ -30,19 +31,21 @@ export default async function AdminDashboard() {
           </p>
         )}
         {events.map((e) => (
-          <Link
+          <div
             key={e.id}
-            href={`/admin/events/${e.id}`}
-            className="flex items-center justify-between rounded-xl bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
+            className="flex items-center justify-between rounded-xl bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
           >
-            <div>
-              <p className="font-semibold text-slate-800">{e.name}</p>
-              <p className="text-sm text-slate-500">
-                {new Date(e.createdAt).toLocaleDateString("pt-BR")} ·{" "}
-                {e._count.submissions} resposta(s)
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
+            <Link
+              href={`/admin/events/${e.id}`}
+              className="flex flex-1 items-center justify-between gap-3"
+            >
+              <div>
+                <p className="font-semibold text-slate-800">{e.name}</p>
+                <p className="text-sm text-slate-500">
+                  {new Date(e.createdAt).toLocaleDateString("pt-BR")} ·{" "}
+                  {e._count.submissions} resposta(s)
+                </p>
+              </div>
               <span
                 className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                   e.active
@@ -52,9 +55,13 @@ export default async function AdminDashboard() {
               >
                 {e.active ? "Ativo" : "Inativo"}
               </span>
-              <span className="text-brand">→</span>
-            </div>
-          </Link>
+            </Link>
+            <DeleteEventButton
+              eventId={e.id}
+              eventName={e.name}
+              submissionCount={e._count.submissions}
+            />
+          </div>
         ))}
       </div>
     </main>
