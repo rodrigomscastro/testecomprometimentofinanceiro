@@ -59,17 +59,31 @@ Cada pergunta vale: **A = 10**, **B = 5**, **C = 0** (máximo 100).
 
 ## Deploy na Vercel
 
-1. Crie um banco PostgreSQL (Vercel Postgres, Neon ou Supabase) e copie a `DATABASE_URL`.
-2. Importe o repositório na Vercel.
-3. Configure as variáveis de ambiente (`DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`).
-4. Após o primeiro deploy, aplique as migrações e o seed apontando para o banco de produção:
+> O script de `build` já roda `prisma migrate deploy` + seed automaticamente, então
+> as tabelas e o usuário administrador são criados no próprio deploy — **não é
+> necessário rodar nada no terminal**, basta configurar as variáveis abaixo.
 
-   ```bash
-   npx prisma migrate deploy
-   npm run seed
-   ```
+1. **Importe o repositório** na Vercel.
 
-   (Pode ser feito localmente com a `DATABASE_URL` de produção no `.env`.)
+2. **Crie o banco PostgreSQL**: aba **Storage → Create Database → Postgres (Neon)**
+   e conecte ao projeto. Na tela "Install Integration":
+   - **Environments**: marque **Production** e **Preview**.
+   - **Create database branch for deployment**: deixe **desmarcado** (um banco só).
+   - **Custom Prefix**: ⭐ use **`DATABASE`** (não o `STORAGE` padrão), para que a
+     variável criada se chame exatamente **`DATABASE_URL`** — o nome que o app espera.
+     Se a variável criada tiver outro nome (ex.: `STORAGE_URL`,
+     `POSTGRES_PRISMA_URL`), crie manualmente uma `DATABASE_URL` com o mesmo valor.
+   - Para migrações mais confiáveis, prefira a connection string **direta/unpooled**
+     (no Neon, o valor de `..._URL_UNPOOLED`/`..._URL_NON_POOLING`).
+
+3. **Configure as demais variáveis** em **Settings → Environment Variables**
+   (Production + Preview):
+   - `NEXTAUTH_SECRET` — gere com `openssl rand -base64 32`.
+   - `NEXTAUTH_URL` — a URL pública, ex.: `https://seuapp.vercel.app`.
+   - `ADMIN_EMAIL` / `ADMIN_PASSWORD` — credenciais de login do painel.
+
+4. **Redeploy** (Deployments → no último deploy → **•••** → **Redeploy**). O build
+   aplica as migrações e cria o admin. Depois, acesse `/admin` e faça login.
 
 ## Estrutura
 
