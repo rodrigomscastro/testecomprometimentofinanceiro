@@ -1,5 +1,6 @@
 import type { Submission } from "@prisma/client";
 import {
+  categoryForScore,
   QUIZ_QUESTIONS,
   RESULT_BANDS,
   type AnswerRecord,
@@ -97,10 +98,12 @@ export function buildStats(submissions: Submission[]): EventStats {
     if (idx > buckets.length - 1) idx = buckets.length - 1;
     histo[idx]++;
   }
+  // Cor de cada faixa = cor da categoria correspondente ao topo da faixa
+  // (ex.: 0-10/11-20 -> verde, 21-50 -> amarelo, 51-100 -> vermelho).
   const scoreHistogram: CountItem[] = buckets.map((label, i) => ({
     label,
     value: histo[i],
-    color: "#1d4ed8",
+    color: RESULT_BANDS[categoryForScore((i + 1) * 10)].color,
   }));
 
   const ecTally = tally(submissions.map((s) => s.estadoCivil));
