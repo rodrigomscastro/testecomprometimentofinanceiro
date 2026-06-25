@@ -149,7 +149,13 @@ function yesNoToGrouped(
   });
 }
 
-export default function EventCharts({ stats }: { stats: EventStats }) {
+export default function EventCharts({
+  stats,
+  exportHref,
+}: {
+  stats: EventStats;
+  exportHref?: string;
+}) {
   const [view, setView] = useState<View>("pizza");
 
   const profileGrouped = yesNoToGrouped([
@@ -162,8 +168,8 @@ export default function EventCharts({ stats }: { stats: EventStats }) {
 
   return (
     <div>
-      {/* Seletor de formato */}
-      <div className="mb-4 flex justify-end">
+      {/* Seletor de formato + exportar CSV, na mesma linha */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="inline-flex rounded-lg border border-slate-300 bg-white p-1">
           {(
             [
@@ -184,6 +190,14 @@ export default function EventCharts({ stats }: { stats: EventStats }) {
             </button>
           ))}
         </div>
+        {exportHref && (
+          <a
+            href={exportHref}
+            className="ml-auto rounded-lg border border-brand px-4 py-2 text-sm font-medium text-brand hover:bg-brand hover:text-white"
+          >
+            Exportar CSV
+          </a>
+        )}
       </div>
 
       {view === "pizza" ? (

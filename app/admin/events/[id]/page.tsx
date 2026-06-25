@@ -86,13 +86,18 @@ export default async function EventDetailPage({
       </section>
 
       {/* Métricas */}
-      <section className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <section className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard label="Respostas" value={stats.total} />
         <StatCard label="Pontuação média" value={stats.averageScore} />
         <StatCard
           label="Mandou Bem (Verde)"
           value={stats.categories[0].value}
           color="#16a34a"
+        />
+        <StatCard
+          label="Endividado (Amarelo)"
+          value={stats.categories[1].value}
+          color="#ca8a04"
         />
         <StatCard
           label="Superend. (Vermelho)"
@@ -109,17 +114,10 @@ export default async function EventDetailPage({
             assim que a plateia começar a responder.
           </div>
         ) : (
-          <>
-            <div className="mb-4 flex justify-end">
-              <a
-                href={`/api/events/${event.id}/export`}
-                className="rounded-lg border border-brand px-4 py-2 text-sm font-medium text-brand hover:bg-brand hover:text-white"
-              >
-                Exportar CSV
-              </a>
-            </div>
-            <EventCharts stats={stats} />
-          </>
+          <EventCharts
+            stats={stats}
+            exportHref={`/api/events/${event.id}/export`}
+          />
         )}
       </section>
     </main>
